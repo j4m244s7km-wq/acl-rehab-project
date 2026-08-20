@@ -1,0 +1,1 @@
+function calcLSI(){const a=parseFloat(document.getElementById('injured').value),b=parseFloat(document.getElementById('healthy').value),r=document.getElementById('result');if(!isFinite(a)||!isFinite(b)||a<0||b<=0){r.textContent='請輸入有效數值，未受傷側必須大於 0。';return}const x=a/b*100;r.innerHTML='此測試的 LSI 約為 <strong>'+x.toFixed(1)+'%</strong>。此比例僅用於功能追蹤，不能單獨判定是否康復或可回場。'}

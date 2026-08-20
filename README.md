@@ -1,2 +1,4 @@
-# acl-rehab-project
-ACL × Rehabilitation × Strength Training — Two-Year Research Project
+# ACL × 復健 × 重訓
+兩年自主學習成果網站。包含個人縱向資料、ACL 復健研究、Return to Sport 與 LSI 追蹤示範工具。
+
+> 本網站為學習研究成果，不提供醫療診斷或回場許可。
