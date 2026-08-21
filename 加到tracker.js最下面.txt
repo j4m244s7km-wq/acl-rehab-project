@@ -1,0 +1,16 @@
+// 首頁串接：若資料由 index.html 傳入，自動進入 LSI 結果頁
+(function(){
+ try{
+  const raw=sessionStorage.getItem('aclStartData');
+  if(!raw) return;
+  const d=JSON.parse(raw);
+  sessionStorage.removeItem('aclStartData');
+  window.addEventListener('DOMContentLoaded',function(){
+   if(document.getElementById('date')) document.getElementById('date').value=d.date||new Date().toISOString().slice(0,10);
+   if(document.getElementById('test')) document.getElementById('test').value=d.test||'單腳跳距離';
+   if(document.getElementById('injured')) document.getElementById('injured').value=d.injured;
+   if(document.getElementById('healthy')) document.getElementById('healthy').value=d.healthy;
+   if(typeof goLSI==='function') goLSI();
+  });
+ }catch(e){}
+})();
