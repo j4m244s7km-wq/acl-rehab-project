@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACL Recovery Tracker｜ACL × 復健 × 重訓</title>
+<link rel="stylesheet" href="tracker.css">
+</head>
+<body>
+<header>
+  <a href="index.html">← 回研究首頁</a>
+  <b>ACL RECOVERY TRACKER</b>
+</header>
+
+<main>
+<section class="hero">
+  <small>FUNCTION TRACKING DEMO</small>
+  <h1>ACL Recovery Tracker</h1>
+  <p>把不同日期的左右側功能數據記錄下來，觀察自己的變化，而不是用單一數字判定「康復」。</p>
+</section>
+
+<section>
+  <h2>① 新增一次紀錄</h2>
+  <div class="panel">
+    <label>日期<input id="date" type="date"></label>
+    <label>測試名稱
+      <select id="test">
+        <option>單腳跳距離</option>
+        <option>其他左右側功能測試</option>
+      </select>
+    </label>
+    <label>受傷側數值<input id="injured" type="number" min="0" step="0.1" placeholder="例如 162"></label>
+    <label>未受傷側數值<input id="healthy" type="number" min="0" step="0.1" placeholder="例如 180"></label>
+    <button onclick="addRecord()">加入紀錄</button>
+    <button class="secondary" onclick="demo()">填入示範資料</button>
+    <p class="hint">兩側必須使用相同測試、相同單位。若沒有正式測試數據，可按「填入示範資料」體驗網站。</p>
+  </div>
+</section>
+
+<section>
+  <h2>② 我的追蹤紀錄</h2>
+  <div id="empty" class="empty">目前還沒有紀錄。</div>
+  <div class="tablewrap">
+    <table id="records" hidden>
+      <thead><tr><th>日期</th><th>測試</th><th>受傷側</th><th>未受傷側</th><th>LSI</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div id="summary" class="summary"></div>
+  <button class="danger" onclick="clearRecords()">清除本裝置紀錄</button>
+</section>
+
+<section class="dark">
+  <h2>③ 怎麼看結果？</h2>
+  <div class="cards">
+    <article><b>LSI</b><p>受傷側 ÷ 未受傷側 × 100%，用來描述同一項測試中左右側的表現比例。</p></article>
+    <article><b>看趨勢</b><p>重點是比較同一個人在不同時間點的變化，而不是和別人的公斤數或距離比較。</p></article>
+    <article><b>不是回場許可</b><p>LSI 只是功能追蹤的一部分，不能單獨證明已完全康復或可以安全重返運動。</p></article>
+  </div>
+</section>
+
+<section>
+  <h2>④ Return to Sport 概念</h2>
+  <div class="steps">
+    <div><strong>Participation</strong><span>重新參與部分訓練</span></div>
+    <i>→</i>
+    <div><strong>Sport</strong><span>回到原本運動項目</span></div>
+    <i>→</i>
+    <div><strong>Performance</strong><span>回到預期運動表現</span></div>
+  </div>
+  <p class="warning">本工具為自主學習與網站功能示範，不提供醫療診斷、復健處方或重返運動許可。實際測試與回場決策應由合格專業人員依個人情況評估。</p>
+</section>
+</main>
+<footer>ACL × 復健 × 重訓｜Two-Year Independent Research Project</footer>
+<script src="tracker.js"></script>
+</body></html>
