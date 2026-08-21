@@ -13,3 +13,29 @@ function clearAll(){if(confirm('確定清除這台裝置上的所有歷史紀錄
 function showHistory(){let a=records();$('modalHistory').innerHTML=a.length?'<table><tr><th>日期</th><th>LSI</th><th>狀態</th></tr>'+a.slice().reverse().map(x=>'<tr><td>'+x.date+'</td><td>'+x.lsi.toFixed(1)+'%</td><td>'+x.stage+'</td></tr>').join('')+'</table>':'目前沒有以前的紀錄。';$('historyModal').hidden=false}
 function hideHistory(){$('historyModal').hidden=true}
 $('date').value=new Date().toISOString().slice(0,10);
+
+// Receive data from the main site's Step 1 and automatically continue to the LSI result.
+(function(){
+  function receiveHomeData(){
+    try{
+      const raw = sessionStorage.getItem('aclStartData');
+      if(!raw) return;
+      const d = JSON.parse(raw);
+      sessionStorage.removeItem('aclStartData');
+
+      if(document.getElementById('date')) document.getElementById('date').value = d.date || new Date().toISOString().slice(0,10);
+      if(document.getElementById('test')) document.getElementById('test').value = d.test || '單腳跳距離';
+      if(document.getElementById('injured')) document.getElementById('injured').value = d.injured;
+      if(document.getElementById('healthy')) document.getElementById('healthy').value = d.healthy;
+
+      if(typeof goLSI === 'function') goLSI();
+    }catch(e){
+      console.error('Unable to receive homepage tracker data', e);
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', receiveHomeData);
+  }else{
+    receiveHomeData();
+  }
+})();
