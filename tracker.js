@@ -1,38 +1,15 @@
-const KEY='aclTrackerRecordsV1';
-function getRecords(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
-function saveRecords(x){localStorage.setItem(KEY,JSON.stringify(x));render()}
-function demo(){
- document.getElementById('date').value=new Date().toISOString().slice(0,10);
- document.getElementById('injured').value=162;
- document.getElementById('healthy').value=180;
-}
-function addRecord(){
- const date=document.getElementById('date').value;
- const test=document.getElementById('test').value;
- const injured=parseFloat(document.getElementById('injured').value);
- const healthy=parseFloat(document.getElementById('healthy').value);
- if(!date||!isFinite(injured)||!isFinite(healthy)||injured<0||healthy<=0){alert('請輸入日期與有效的左右側數值。');return}
- const lsi=injured/healthy*100;
- const arr=getRecords();
- arr.push({id:Date.now(),date,test,injured,healthy,lsi});
- arr.sort((a,b)=>a.date.localeCompare(b.date));
- saveRecords(arr);
-}
-function removeRecord(id){saveRecords(getRecords().filter(x=>x.id!==id))}
-function clearRecords(){if(confirm('確定要清除這台裝置上的追蹤紀錄嗎？'))saveRecords([])}
-function render(){
- const arr=getRecords(), table=document.getElementById('records'), empty=document.getElementById('empty'), body=table.querySelector('tbody'), summary=document.getElementById('summary');
- body.innerHTML='';
- if(!arr.length){table.hidden=true;empty.hidden=false;summary.textContent='';return}
- table.hidden=false;empty.hidden=true;
- arr.forEach(x=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${x.date}</td><td>${x.test}</td><td>${x.injured}</td><td>${x.healthy}</td><td><strong>${x.lsi.toFixed(1)}%</strong></td><td><button onclick="removeRecord(${x.id})">刪除</button></td>`;
-  body.appendChild(tr);
- });
- if(arr.length>=2){
-  const first=arr[0].lsi,last=arr[arr.length-1].lsi,d=last-first;
-  summary.textContent=`從第一筆到最新一筆，LSI 變化 ${d>=0?'+':''}${d.toFixed(1)} 個百分點。這只描述紀錄趨勢，不代表康復程度或回場許可。`;
- }else summary.textContent=`目前 LSI 為 ${arr[0].lsi.toFixed(1)}%。新增不同日期的相同測試後，就能比較趨勢。`;
-}
-render();
+const KEY='aclRecoveryWizardV2'; let current=null;
+const $=id=>document.getElementById(id);
+function records(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+function setRecords(a){localStorage.setItem(KEY,JSON.stringify(a))}
+function go(n){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('step'+n).classList.add('active');document.querySelectorAll('.dot').forEach((x,i)=>x.classList.toggle('active',i<n));scrollTo({top:260,behavior:'smooth'})}
+function demo(){$('date').value=new Date().toISOString().slice(0,10);$('injured').value=162;$('healthy').value=180}
+function goLSI(){let date=$('date').value,inj=+$('injured').value,hea=+$('healthy').value;if(!date||!isFinite(inj)||!isFinite(hea)||inj<0||hea<=0){alert('請先輸入日期與有效的左右側數值。');return}let lsi=inj/hea*100;current={id:Date.now(),date,test:$('test').value,injured:inj,healthy:hea,lsi};$('lsiBig').textContent=lsi.toFixed(1)+'%';$('barFill').style.width=Math.min(lsi,100)+'%';$('lsiText').textContent='這代表本次同一項測試中，受傷側表現約為未受傷側的 '+lsi.toFixed(1)+'%。這不是「康復百分比」。';let a=records(),prev=a.length?a[a.length-1]:null;$('quickCompare').textContent=prev?'上一筆 LSI：'+prev.lsi.toFixed(1)+'%｜本次變化：'+signed(lsi-prev.lsi)+' 個百分點':'這是第一筆紀錄，儲存後下次即可自動比較。';go(2)}
+function signed(n){return (n>=0?'+':'')+n.toFixed(1)}
+function saveAndDashboard(){if(!current){go(1);return}Object.assign(current,{stage:$('stage').value,run:$('run').checked,sprint:$('sprint').checked,jump:$('jump').checked,sport:$('sport').checked,note:$('note').value});let a=records();a.push(current);a.sort((x,y)=>x.date.localeCompare(y.date)||x.id-y.id);setRecords(a);renderDash();go(4)}
+function renderDash(){let a=records();if(!a.length)return;let last=a[a.length-1],prev=a.length>1?a[a.length-2]:null;$('dLSI').textContent=last.lsi.toFixed(1)+'%';$('dChange').textContent=prev?signed(last.lsi-prev.lsi)+' pt':'首次紀錄';$('dCount').textContent=a.length+' 次';$('dStage').textContent=last.stage;let chart=$('chart');chart.innerHTML='';a.slice(-8).forEach(x=>{let c=document.createElement('div');c.className='col';c.style.height=Math.max(8,Math.min(100,x.lsi))+'%';c.innerHTML='<b>'+x.lsi.toFixed(0)+'%</b><span>'+x.date.slice(5)+'</span>';chart.appendChild(c)});$('historyBody').innerHTML=a.slice().reverse().map(x=>'<tr><td>'+x.date+'</td><td>'+x.test+'</td><td>'+x.lsi.toFixed(1)+'%</td><td>'+x.stage+'</td></tr>').join('')}
+function newRecord(){current=null;$('date').value=new Date().toISOString().slice(0,10);$('injured').value='';$('healthy').value='';$('note').value='';['run','sprint','jump','sport'].forEach(x=>$(x).checked=false);go(1)}
+function clearAll(){if(confirm('確定清除這台裝置上的所有歷史紀錄嗎？')){localStorage.removeItem(KEY);current=null;newRecord()}}
+function showHistory(){let a=records();$('modalHistory').innerHTML=a.length?'<table><tr><th>日期</th><th>LSI</th><th>狀態</th></tr>'+a.slice().reverse().map(x=>'<tr><td>'+x.date+'</td><td>'+x.lsi.toFixed(1)+'%</td><td>'+x.stage+'</td></tr>').join('')+'</table>':'目前沒有以前的紀錄。';$('historyModal').hidden=false}
+function hideHistory(){$('historyModal').hidden=true}
+$('date').value=new Date().toISOString().slice(0,10);

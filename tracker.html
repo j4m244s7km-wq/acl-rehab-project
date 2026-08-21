@@ -1,76 +1,88 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ACL Recovery Tracker｜ACL × 復健 × 重訓</title>
-<link rel="stylesheet" href="tracker.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACL Recovery Tracker</title><link rel="stylesheet" href="tracker.css">
 </head>
 <body>
-<header>
-  <a href="index.html">← 回研究首頁</a>
-  <b>ACL RECOVERY TRACKER</b>
-</header>
-
+<header><a href="index.html">← 回研究首頁</a><b>ACL RECOVERY TRACKER</b></header>
 <main>
-<section class="hero">
-  <small>FUNCTION TRACKING DEMO</small>
-  <h1>ACL Recovery Tracker</h1>
-  <p>把不同日期的左右側功能數據記錄下來，觀察自己的變化，而不是用單一數字判定「康復」。</p>
+<section class="hero"><span>PERSONAL FUNCTION TRACKING</span><h1>ACL Recovery Tracker</h1>
+<p>一次完成紀錄 → 計算 → 比較 → 儲存。再次使用時，只需要新增本次資料。</p></section>
+
+<nav class="progress">
+ <div class="dot active" data-step="1">1<span>建立紀錄</span></div>
+ <div class="line"></div><div class="dot" data-step="2">2<span>LSI結果</span></div>
+ <div class="line"></div><div class="dot" data-step="3">3<span>功能狀態</span></div>
+ <div class="line"></div><div class="dot" data-step="4">4<span>Dashboard</span></div>
+</nav>
+
+<section class="page active" id="step1">
+ <h2>Step 1｜建立本次紀錄</h2><p class="sub">輸入同一項左右側測試的結果。</p>
+ <div class="card grid">
+  <label>日期<input id="date" type="date"></label>
+  <label>測試名稱<select id="test"><option>單腳跳距離</option><option>其他左右側功能測試</option></select></label>
+  <label>受傷側數值<input id="injured" type="number" min="0" step=".1" placeholder="例如 162"></label>
+  <label>未受傷側數值<input id="healthy" type="number" min="0" step=".1" placeholder="例如 180"></label>
+  <button class="secondary" onclick="demo()">填入示範資料</button>
+  <button onclick="goLSI()">計算並前往下一步 →</button>
+ </div>
+ <button class="textbtn" onclick="showHistory()">查看以前的紀錄</button>
 </section>
 
-<section>
-  <h2>① 新增一次紀錄</h2>
-  <div class="panel">
-    <label>日期<input id="date" type="date"></label>
-    <label>測試名稱
-      <select id="test">
-        <option>單腳跳距離</option>
-        <option>其他左右側功能測試</option>
-      </select>
-    </label>
-    <label>受傷側數值<input id="injured" type="number" min="0" step="0.1" placeholder="例如 162"></label>
-    <label>未受傷側數值<input id="healthy" type="number" min="0" step="0.1" placeholder="例如 180"></label>
-    <button onclick="addRecord()">加入紀錄</button>
-    <button class="secondary" onclick="demo()">填入示範資料</button>
-    <p class="hint">兩側必須使用相同測試、相同單位。若沒有正式測試數據，可按「填入示範資料」體驗網站。</p>
-  </div>
+<section class="page" id="step2">
+ <h2>Step 2｜本次 LSI</h2>
+ <div class="resultCard"><small>本次 Limb Symmetry Index</small><div id="lsiBig">--%</div>
+  <div class="bar"><i id="barFill"></i></div>
+  <p id="lsiText"></p>
+ </div>
+ <div class="compare" id="quickCompare"></div>
+ <div class="actions"><button class="secondary" onclick="go(1)">← 修改資料</button><button onclick="go(3)">繼續記錄功能狀態 →</button></div>
 </section>
 
-<section>
-  <h2>② 我的追蹤紀錄</h2>
-  <div id="empty" class="empty">目前還沒有紀錄。</div>
-  <div class="tablewrap">
-    <table id="records" hidden>
-      <thead><tr><th>日期</th><th>測試</th><th>受傷側</th><th>未受傷側</th><th>LSI</th><th></th></tr></thead>
-      <tbody></tbody>
-    </table>
+<section class="page" id="step3">
+ <h2>Step 3｜本次功能狀態</h2>
+ <p class="sub">這些是自我紀錄欄位，不是醫療判定。</p>
+ <div class="card">
+  <label>目前可參與的運動程度
+   <select id="stage">
+    <option value="日常活動／基礎訓練">日常活動／基礎訓練</option>
+    <option value="部分運動訓練">部分運動訓練</option>
+    <option value="原運動項目">原運動項目</option>
+    <option value="接近原本運動表現">接近原本運動表現</option>
+   </select>
+  </label>
+  <div class="checks">
+   <label><input type="checkbox" id="run"> 可進行一般跑步</label>
+   <label><input type="checkbox" id="sprint"> 可進行高速跑動／衝刺</label>
+   <label><input type="checkbox" id="jump"> 可進行已被允許的跳躍訓練</label>
+   <label><input type="checkbox" id="sport"> 可參與部分專項訓練</label>
   </div>
-  <div id="summary" class="summary"></div>
-  <button class="danger" onclick="clearRecords()">清除本裝置紀錄</button>
+  <label>備註（選填）<textarea id="note" placeholder="例如：目前仍不敢全力衝刺"></textarea></label>
+ </div>
+ <div class="actions"><button class="secondary" onclick="go(2)">← 上一步</button><button onclick="saveAndDashboard()">儲存並產生 Dashboard →</button></div>
 </section>
 
-<section class="dark">
-  <h2>③ 怎麼看結果？</h2>
-  <div class="cards">
-    <article><b>LSI</b><p>受傷側 ÷ 未受傷側 × 100%，用來描述同一項測試中左右側的表現比例。</p></article>
-    <article><b>看趨勢</b><p>重點是比較同一個人在不同時間點的變化，而不是和別人的公斤數或距離比較。</p></article>
-    <article><b>不是回場許可</b><p>LSI 只是功能追蹤的一部分，不能單獨證明已完全康復或可以安全重返運動。</p></article>
-  </div>
+<section class="page" id="step4">
+ <h2>Step 4｜我的 Recovery Dashboard</h2>
+ <div class="dash">
+  <article><small>最新 LSI</small><strong id="dLSI">--</strong></article>
+  <article><small>與上次相比</small><strong id="dChange">--</strong></article>
+  <article><small>累積紀錄</small><strong id="dCount">--</strong></article>
+  <article><small>本次運動狀態</small><strong id="dStage">--</strong></article>
+ </div>
+ <div class="card">
+  <h3>歷次 LSI 趨勢</h3><div id="chart" class="chart"></div>
+  <p class="caption">圖表只顯示同一使用者歷次紀錄的變化，不代表康復百分比。</p>
+ </div>
+ <div class="card"><h3>歷史紀錄</h3><div class="tablewrap"><table><thead><tr><th>日期</th><th>測試</th><th>LSI</th><th>功能狀態</th></tr></thead><tbody id="historyBody"></tbody></table></div></div>
+ <div class="actions"><button class="secondary" onclick="newRecord()">＋ 新增下一次紀錄</button><button onclick="go(1)">修改本次輸入</button></div>
+ <button class="danger" onclick="clearAll()">清除這台裝置的所有紀錄</button>
 </section>
 
-<section>
-  <h2>④ Return to Sport 概念</h2>
-  <div class="steps">
-    <div><strong>Participation</strong><span>重新參與部分訓練</span></div>
-    <i>→</i>
-    <div><strong>Sport</strong><span>回到原本運動項目</span></div>
-    <i>→</i>
-    <div><strong>Performance</strong><span>回到預期運動表現</span></div>
-  </div>
-  <p class="warning">本工具為自主學習與網站功能示範，不提供醫療診斷、復健處方或重返運動許可。實際測試與回場決策應由合格專業人員依個人情況評估。</p>
-</section>
+<section id="historyModal" class="modal" hidden><div class="modalbox"><button class="close" onclick="hideHistory()">×</button><h2>以前的紀錄</h2><div id="modalHistory"></div></div></section>
+
+<section class="notice"><b>重要說明</b><p>本工具為自主學習與網站功能示範，用於整理與比較使用者自行取得的功能數據。單一 LSI 或網站紀錄不能證明完全康復，也不能提供重返運動許可；實際測試與回場決策應由合格專業人員依個人情況評估。</p></section>
 </main>
 <footer>ACL × 復健 × 重訓｜Two-Year Independent Research Project</footer>
-<script src="tracker.js"></script>
-</body></html>
+<script src="tracker.js"></script></body></html>
