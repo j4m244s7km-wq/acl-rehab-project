@@ -14,25 +14,31 @@ function showHistory(){let a=records();$('modalHistory').innerHTML=a.length?'<ta
 function hideHistory(){$('historyModal').hidden=true}
 $('date').value=new Date().toISOString().slice(0,10);
 
-// Receive data from the main site's Step 1 and automatically continue to the LSI result.
+// Read Step 1 data passed from index.html through the URL.
 (function(){
   function receiveHomeData(){
     try{
-      const raw = sessionStorage.getItem('aclStartData');
-      if(!raw) return;
-      const d = JSON.parse(raw);
-      sessionStorage.removeItem('aclStartData');
+      const p = new URLSearchParams(window.location.search);
+      const injured = parseFloat(p.get('injured'));
+      const healthy = parseFloat(p.get('healthy'));
+      if(!Number.isFinite(injured) || !Number.isFinite(healthy) || healthy <= 0) return;
 
-      if(document.getElementById('date')) document.getElementById('date').value = d.date || new Date().toISOString().slice(0,10);
-      if(document.getElementById('test')) document.getElementById('test').value = d.test || '單腳跳距離';
-      if(document.getElementById('injured')) document.getElementById('injured').value = d.injured;
-      if(document.getElementById('healthy')) document.getElementById('healthy').value = d.healthy;
+      const dateEl = document.getElementById('date');
+      const testEl = document.getElementById('test');
+      const injuredEl = document.getElementById('injured');
+      const healthyEl = document.getElementById('healthy');
+
+      if(dateEl) dateEl.value = p.get('date') || new Date().toISOString().slice(0,10);
+      if(testEl) testEl.value = p.get('test') || '單腳跳距離';
+      if(injuredEl) injuredEl.value = injured;
+      if(healthyEl) healthyEl.value = healthy;
 
       if(typeof goLSI === 'function') goLSI();
     }catch(e){
-      console.error('Unable to receive homepage tracker data', e);
+      console.error(e);
     }
   }
+
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', receiveHomeData);
   }else{
